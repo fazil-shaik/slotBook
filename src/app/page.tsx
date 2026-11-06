@@ -5,7 +5,6 @@ export default function HomePage() {
     <div className="max-w-5xl mx-auto px-4 py-12">
       <div className="text-center max-w-3xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold mb-4">
-          <span>⚡ Take-Home Assignment Implementation</span>
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
           Slotbook Booking Engine
