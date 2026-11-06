@@ -8,7 +8,7 @@
 
 ## 1. Project Links & Overview
 
-- **Repository**: [https://github.com/shaik-slotbook/slotbook](https://github.com/shaik-slotbook/slotbook) *(or current repo)*
+- **Repository**: [https://github.com/fazil-shaik/slotBook](https://github.com/fazil-shaik/slotBook)
 - **Demo Surfaces**:
   - **Host Dashboard**: `/dashboard`
   - **Public Booking (30-min Intro 1-on-1)**: `/rachit/30-min-intro`
