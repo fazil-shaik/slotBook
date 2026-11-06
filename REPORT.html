@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Slotbook — Architecture, Reliability & System Report</title>
   <style>
     @media print {
-      body { font-size: 11pt; }
-      .page-break { page-break-before: always; }
-      nav, .no-print { display: none; }
+      body {
+        font-size: 11pt;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      nav,
+      .no-print {
+        display: none;
+      }
     }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.6;
@@ -17,28 +28,96 @@
       margin: 40px auto;
       padding: 0 20px;
     }
-    h1 { font-size: 2.2rem; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
-    h2 { font-size: 1.5rem; color: #0284c7; margin-top: 36px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; }
-    h3 { font-size: 1.2rem; color: #334155; margin-top: 24px; }
-    pre { background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; }
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
-    th, td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left; }
-    th { background: #f8fafc; font-weight: 600; color: #334155; }
-    blockquote { border-left: 4px solid #0284c7; margin: 0; padding-left: 16px; color: #475569; background: #f0f9ff; padding: 12px 16px; border-radius: 0 8px 8px 0; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #e0f2fe; color: #0369a1; }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #0284c7;
+      margin-top: 36px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: #334155;
+      margin-top: 24px;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    blockquote {
+      border-left: 4px solid #0284c7;
+      margin: 0;
+      padding-left: 16px;
+      color: #475569;
+      background: #f0f9ff;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
   </style>
 </head>
+
 <body>
   <h1>Slotbook — Architecture, Reliability & System Report</h1>
   <blockquote>
     <strong>Author</strong>: Shaik &bull; <strong>Brief</strong>: Slotbook Take-Home Assignment (@Rachit)<br>
-    <strong>Core Guarantee</strong>: Full-stack TypeScript application on PostgreSQL where hosts publish when free, guests book slots, and <strong>nobody is ever double-booked</strong> — even under concurrent race conditions, network failures, or clock shifts.
+    <strong>Core Guarantee</strong>: Full-stack TypeScript application on PostgreSQL where hosts publish when free,
+    guests book slots, and <strong>nobody is ever double-booked</strong> — even under concurrent race conditions,
+    network failures, or clock shifts.
   </blockquote>
 
   <h2>1. Links & System Overview</h2>
   <ul>
-    <li><strong>Public GitHub Repository</strong>: <a href="https://github.com/fazil-shaik/slotBook">https://github.com/fazil-shaik/slotBook</a></li>
+    <li><strong>Public GitHub Repository</strong>: <a
+        href="https://github.com/fazil-shaik/slotBook">https://github.com/fazil-shaik/slotBook</a></li>
     <li><strong>Host Dashboard</strong>: <code>/dashboard</code></li>
     <li><strong>Public Booking (30-min 1-on-1)</strong>: <code>/rachit/30-min-intro</code></li>
     <li><strong>Public Booking (60-min Group x3)</strong>: <code>/rachit/60-min-deep-dive</code></li>
@@ -59,14 +138,16 @@
   <h2>3. Key Concurrency & Reliability Highlights</h2>
   <p>All race conditions are solved inside PostgreSQL transactions using transaction-scoped advisory locks:</p>
   <pre>SELECT pg_advisory_xact_lock(hashtext('host_lock_' || host_id));</pre>
-  <p>Concurrency stress test verified: <strong>20 simultaneous hold requests</strong> on a capacity=1 slot resulted in <strong>exactly 1 success</strong> and <strong>19 rejections (409 Conflict)</strong>.</p>
+  <p>Concurrency stress test verified: <strong>20 simultaneous hold requests</strong> on a capacity=1 slot resulted in
+    <strong>exactly 1 success</strong> and <strong>19 rejections (409 Conflict)</strong>.</p>
 
   <h2>4. Daylight Saving Time Worked Example</h2>
   <ul>
     <li><strong>EDT (Oct 30, 2026)</strong>: 09:00 AM EDT = <code>13:00:00Z</code></li>
     <li><strong>EST (Nov 02, 2026)</strong>: 09:00 AM EST = <code>14:00:00Z</code></li>
   </ul>
-  <p>Automatically handled via IANA timezone conversions, ensuring zero booking drift across daylight saving transitions.</p>
+  <p>Automatically handled via IANA timezone conversions, ensuring zero booking drift across daylight saving
+    transitions.</p>
 
   <h2>5. How to Run</h2>
   <pre>
@@ -77,4 +158,5 @@ pnpm test
 docker compose up
   </pre>
 </body>
+
 </html>
